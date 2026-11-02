@@ -1,26 +1,24 @@
-# ~~Burn~~ Replace with your own after reading
+# ChatSystem
 
-This private repository is created for you so that your teachers have access to it.
+Système de clavardage distribué et décentralisé (INSA Toulouse, 4IR) :
+découverte des utilisateurs en UDP, échanges en TCP, historique SQLite/JDBC, interface Swing.
 
-## Identify yourself
+## Prérequis
 
-Before anything, **complete the `metadata.yml` with your own information.** 
+- JDK 11 ou plus
+- Maven 3.8+
 
-This is the file that we will use to identify the teacher responsible for the repository and assign the grades to the participating students.
+## Build et tests
 
-## Take ownership
+    mvn verify
 
-As long as you make sure to keep the `metadata.yml` file at the root of this repository, you are free to do anything. Our suggestion would be to have it organized into something like the following:
+## Lancer l'agent
 
-    .gitignore
-    metadata.yml
-    pom.xml
-    README.md
-    src/
-      main/
-      test/
-    doc/
-      uml/
-      report.pdf
+    java -jar target/chatsystem-0.1.0-SNAPSHOT.jar
 
-In particular, you will soon have to replace this README with something that describes your own project.
+## Organisation
+
+    src/main/java   code de l'application
+    src/test/java   tests unitaires et d'intégration
+    doc/uml         diagrammes UML
+    .github         intégration continue
