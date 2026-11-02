@@ -1,0 +1,48 @@
+
+sequenceDiagram
+    autonumber
+
+    actor U as User
+    participant UI as Chat UI
+    participant CM as Connection Manager
+    participant DM as Discovery Manager
+    participant UDP as UDP Network
+    participant Other as Other Users
+    participant DB as Contact Database
+
+    U->>UI: Enter nickname
+    U->>UI: Click Connect
+    UI->>CM: connect(nickname)
+
+    Note over CM,Other: Discover users on the network
+
+    CM->>DM: startDiscovery()
+    DM->>UDP: DISCOVERY_REQUEST
+    UDP-->>Other: DISCOVERY_REQUEST
+
+    Other->>UDP: DISCOVERY_RESPONSE (nickname, IP)
+    UDP-->>DM: DISCOVERY_RESPONSE
+
+    DM->>DB: Store discovered contacts
+    DB-->>DM: Contacts list
+
+    DM-->>CM: Return discovered contacts
+
+    Note over CM,DB: Check nickname uniqueness locally
+
+    CM->>DB: isNicknameAvailable(nickname)
+    DB-->>CM: Availability result
+
+    alt Nickname already in use
+        CM-->>UI: Connection rejected
+        UI-->>U: Display error
+    else Nickname available
+        CM->>DM: announcePresence(nickname)
+        DM->>UDP: USER_JOINED (nickname, IP)
+        UDP-->>Other: USER_JOINED
+        Other->>DB: Add new contact
+        Other->>UI: Update contact list
+
+        CM-->>UI: Connection successful
+        UI-->>U: Display contact list
+    end

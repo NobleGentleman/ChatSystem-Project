@@ -1,0 +1,30 @@
+---
+config:
+  theme: redux-color
+---
+usecase-beta
+direction LR
+actor User("User")
+systemBoundary "ChatSystem"
+  LogIn("Log in to the application")
+  LogOut("Log out of the application")
+  ChooseUsername("Choose username")
+  ChangeUsername("Change username")
+  CheckUsernameUniqueness("Check whether username is unique")
+  Chat("Chat with another user")
+  SendTextMessage("Send text message")
+  ReceiveTextMessage("Receive text message")
+  ViewChatHistory("View chat history")
+end
+User --> LogIn
+User --> LogOut
+User --> ChooseUsername
+User --> Chat
+
+ChooseUsername ..> : include CheckUsernameUniqueness
+ChangeUsername ..> : extend ChooseUsername
+ChooseUsername ..> : include LogIn
+Chat ..> : include LogIn
+SendTextMessage ..> : extend Chat
+ReceiveTextMessage ..> : extend Chat
+ViewChatHistory ..> : extend Chat

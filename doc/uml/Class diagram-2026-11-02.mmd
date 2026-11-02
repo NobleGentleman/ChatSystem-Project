@@ -1,0 +1,71 @@
+classDiagram
+    direction LR
+    class Thread {
+        <<Java>>
+        +run()
+    }
+    note for Thread "Java base class"
+    class User {
+        -String username
+        -String ipAddress
+        +getUsername() String
+        +setUsername(String username)
+    }
+    note for User "A connected user of the chat system"
+    class Message {
+        -String content
+        -LocalDateTime timestamp
+        -User sender
+    }
+    note for Message "A single chat message"
+    class Session {
+        -User correspondent
+        -List~Message~ history
+        +send(Message m)
+        +close()
+    }
+    note for Session "A conversation with one correspondent"
+    class UserList {
+        <<singleton>>
+        -UserList instance$
+        -List~User~ users
+        +getInstance()$ UserList
+        +add(User u)
+        +remove(User u)
+        +changeUsername(User u, String newName)
+        +isUsernameUnique(String username) boolean
+    }
+    note for UserList "Keeps track of all active users"
+    class UDPServer {
+        -MulticastSocket socket
+        +run()
+    }
+    note for UDPServer "Listens to UDP broadcasts (discovery, username changes)"
+    class TCPServer {
+        -ServerSocket socket
+        +run()
+    }
+    note for TCPServer "Accepts incoming TCP connections"
+    class TCPClient {
+        -Socket socket
+        -PrintWriter out
+        -BufferedReader in
+        +send(Message m)
+        +run()
+    }
+    note for TCPClient "Handles one TCP connection with another user"
+
+    %% Inheritance
+    Thread <|-- UDPServer
+    Thread <|-- TCPServer
+    Thread <|-- TCPClient
+
+    %% Relationships
+    UserList "1" o-- "*" User : contains
+    UDPServer --> UserList : updates
+    TCPClient --> UserList : updates
+    TCPServer ..> TCPClient : creates
+    User "1" --> "0..1" TCPClient : uses
+    Session "1" *-- "*" Message : stores
+    Session --> User : talks to
+    Message --> User : references
