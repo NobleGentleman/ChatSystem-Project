@@ -1,24 +1,24 @@
 # ChatSystem
 
-Système de clavardage distribué et décentralisé (INSA Toulouse, 4IR) :
-découverte des utilisateurs en UDP, échanges en TCP, historique SQLite/JDBC, interface Swing.
+Distributed, decentralized chat system (INSA Toulouse, 4IR):
+user discovery over UDP, message exchange over TCP, SQLite/JDBC history, Swing interface.
 
-## Prérequis
+## Prerequisites
 
-- JDK 11 ou plus
+- JDK 11 or later
 - Maven 3.8+
 
-## Build et tests
+## Build and tests
 
     mvn verify
 
-## Lancer l'agent
+## Running the agent
 
     java -jar target/chatsystem-0.1.0-SNAPSHOT.jar
 
-## Organisation
+## Project structure
 
-    src/main/java   code de l'application
-    src/test/java   tests unitaires et d'intégration
-    doc/uml         diagrammes UML
-    .github         intégration continue
+    src/main/java   application code
+    src/test/java   unit and integration tests
+    doc/uml         UML diagrams
+    .github         continuous integration

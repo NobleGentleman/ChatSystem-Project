@@ -1,7 +1,7 @@
-group: A1  # replace with your own group (A1, A2, B1, B2, C1, SC1)
-names:  # Replace with your own names (lastname first)
-  - Anglade Aurelien
+group: A1
+names:
+  - Anglade Aurélien
   - Morra-Fischer Mathis
-emails:  # Replace with your own INSA email address
+emails:
   - aanglade@insa-toulouse.fr
   - morra-fische@insa-toulouse.fr
