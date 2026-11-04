@@ -19,6 +19,11 @@ public class UserTest {
     }
 
     @Test
+    void constructor_rejectsNullIpAddress() {
+        assertThrows(NullPointerException.class, () -> new User(null));
+    }
+
+    @Test
     void getIpAddress_returnsConstructorIpAddress() {
         assertEquals(ipAddress, user.getIpAddress());
     }
