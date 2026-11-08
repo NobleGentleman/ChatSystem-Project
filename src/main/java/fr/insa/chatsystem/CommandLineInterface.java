@@ -1,12 +1,19 @@
 package fr.insa.chatsystem;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class CommandLineInterface {
+    private final Scanner scanner;
+    private final PrintStream out;
 
-    private final Scanner scanner = new Scanner(System.in);
+    public CommandLineInterface(InputStream in, PrintStream out) {
+        this.scanner = new Scanner(in);
+        this.out = out;
+    }
 
     public User askUsername() throws UnknownHostException {
         InetAddress ipAddress = InetAddress.getByName("192.168.1.10"); // arbitrary for now
@@ -14,13 +21,13 @@ public class CommandLineInterface {
         String username;
 
         while(true) {
-            System.out.print("Please enter your username: ");
+            out.print("Please enter your username: ");
             username = scanner.nextLine().trim();
 
             if (username.isEmpty()) {
-                System.out.println("Username cannot be empty.");
+                out.println("Username cannot be empty.");
             } /*else if (!isUsernameAvailable(username)) {
-                System.out.println("This username is already taken.");
+                out.println("This username is already taken.");
             } */ else {
                 break;
             }

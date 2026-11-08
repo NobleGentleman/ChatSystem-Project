@@ -15,12 +15,12 @@ public final class Main {
     public static void main(String[] args) {
         LOG.info("ChatSystem started");
 
-        CommandLineInterface cli = new CommandLineInterface();
+        CommandLineInterface cli = new CommandLineInterface(System.in, System.out);
         try {
             User user = cli.askUsername();
             System.out.println("Welcome, " + user.getUsername() + "!");
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            LOG.error("Unable to resolve the IP address", e);
             System.err.println("Error: unable to resolve the IP address.");
         }
     }
