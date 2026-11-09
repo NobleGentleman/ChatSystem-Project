@@ -2,9 +2,8 @@ package fr.insa.chatsystem;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 public class CommandLineInterface {
     private final Scanner scanner;
@@ -15,25 +14,29 @@ public class CommandLineInterface {
         this.out = out;
     }
 
-    public User askUsername() throws UnknownHostException {
-        InetAddress ipAddress = InetAddress.getByName("192.168.1.10"); // arbitrary for now
-        User user = new User(ipAddress);
-        String username;
+    public String askUsername() {
+        return askUsername(name -> true);
+    }
 
-        while(true) {
+    public String askUsername(Predicate<String> isAvailable) {
+        while (true) {
             out.print("Please enter your username: ");
-            username = scanner.nextLine().trim();
+            String username = scanner.nextLine().trim();
 
-            if (username.isEmpty()) {
-                out.println("Username cannot be empty.");
-            } /*else if (!isUsernameAvailable(username)) {
-                out.println("This username is already taken.");
-            } */ else {
-                break;
+            UsernameStatus status = UsernameValidator.validate(username);
+            if (!status.isValid()) {
+                out.println(status.getMessage());
+            } else if (!isAvailable.test(username)) {
+                out.println(UsernameStatus.ALREADY_TAKEN.getMessage());
+            } else {
+                return username;
             }
         }
+    }
 
-        user.setUsername(username);
-        return user;
+    /** Lit une commande tapée par l'utilisateur, ou null si l'entrée est fermée. */
+    public String readCommand() {
+        out.print("> ");
+        return scanner.hasNextLine() ? scanner.nextLine().trim() : null;
     }
 }

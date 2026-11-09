@@ -25,24 +25,48 @@ class CommandLineInterfaceTest {
 
     @Test
     void askUsername_acceptsValid() throws UnknownHostException {
-        User user = cliWithInput("Alice\n").askUsername();
+        String username = cliWithInput("Alice\n").askUsername();
 
-        assertFalse(outBuf.toString().contains("Username cannot be empty."));
-        assertEquals("Alice", user.getUsername());
+        assertFalse(outBuf.toString().contains(UsernameStatus.EMPTY.getMessage()));
+        assertEquals("Alice", username);
     }
 
     @Test
     void askUsername_trimsWhitespace() throws UnknownHostException {
-        User user = cliWithInput("   Alice   \n").askUsername();
+        String username = cliWithInput("   Alice   \n").askUsername();
 
-        assertEquals("Alice", user.getUsername());
+        assertEquals("Alice", username);
     }
 
     @Test
     void askUsername_rejectsEmptyThenAcceptsValid() throws UnknownHostException {
-        User user = cliWithInput("\nAlice\n").askUsername();
+        String username = cliWithInput("\nAlice\n").askUsername();
 
-        assertTrue(outBuf.toString().contains("Username cannot be empty."));
-        assertEquals("Alice", user.getUsername());
+        assertTrue(outBuf.toString().contains(UsernameStatus.EMPTY.getMessage()));
+        assertEquals("Alice", username);
+    }
+
+    @Test
+    void askUsername_rejectsTakenThenAcceptsFree() throws UnknownHostException {
+        String username = cliWithInput("Alice\nBob\n").askUsername(name -> !name.equals("Alice"));
+
+        assertTrue(outBuf.toString().contains(UsernameStatus.ALREADY_TAKEN.getMessage()));
+        assertEquals("Bob", username);
+    }
+
+    @Test
+    void askUsername_rejectsInvalidCharactersThenAcceptsValid() throws UnknownHostException {
+        String username = cliWithInput("a;b\nAlice\n").askUsername();
+
+        assertTrue(outBuf.toString().contains(UsernameStatus.INVALID_CHARACTERS.getMessage()));
+        assertEquals("Alice", username);
+    }
+
+    @Test
+    void askUsername_rejectsTooLongThenAcceptsValid() throws UnknownHostException {
+        String username = cliWithInput("abcdefghijklm\nAlice\n").askUsername();
+
+        assertTrue(outBuf.toString().contains(UsernameStatus.TOO_LONG.getMessage()));
+        assertEquals("Alice", username);
     }
 }
