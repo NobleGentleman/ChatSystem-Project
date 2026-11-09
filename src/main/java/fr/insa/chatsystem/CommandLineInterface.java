@@ -29,10 +29,11 @@ public class CommandLineInterface {
             out.print("Please enter your username: ");
             username = scanner.nextLine().trim();
 
-            if (username.isEmpty()) {
-                out.println("Username cannot be empty.");
+            UsernameStatus status = UsernameValidator.validate(username);
+            if (!status.isValid()) {
+                out.println(status.getMessage());
             } else if (!isAvailable.test(username)) {
-                out.println("This username is already taken.");
+                out.println(UsernameStatus.ALREADY_TAKEN.getMessage());
             } else {
                 break;
             }
