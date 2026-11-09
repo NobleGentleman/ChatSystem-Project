@@ -45,4 +45,12 @@ class CommandLineInterfaceTest {
         assertTrue(outBuf.toString().contains("Username cannot be empty."));
         assertEquals("Alice", user.getUsername());
     }
+
+    @Test
+    void askUsername_rejectsTakenThenAcceptsFree() throws UnknownHostException {
+        User user = cliWithInput("Alice\nBob\n").askUsername(name -> !name.equals("Alice"));
+
+        assertTrue(outBuf.toString().contains("This username is already taken."));
+        assertEquals("Bob", user.getUsername());
+    }
 }

@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 public class CommandLineInterface {
     private final Scanner scanner;
@@ -16,24 +17,34 @@ public class CommandLineInterface {
     }
 
     public User askUsername() throws UnknownHostException {
+        return askUsername(name -> true);
+    }
+
+    public User askUsername(Predicate<String> isAvailable) throws UnknownHostException {
         InetAddress ipAddress = InetAddress.getByName("192.168.1.10"); // arbitrary for now
         User user = new User(ipAddress);
         String username;
 
-        while(true) {
+        while (true) {
             out.print("Please enter your username: ");
             username = scanner.nextLine().trim();
 
             if (username.isEmpty()) {
                 out.println("Username cannot be empty.");
-            } /*else if (!isUsernameAvailable(username)) {
+            } else if (!isAvailable.test(username)) {
                 out.println("This username is already taken.");
-            } */ else {
+            } else {
                 break;
             }
         }
 
         user.setUsername(username);
         return user;
+    }
+
+    /** Lit une commande tapée par l'utilisateur, ou null si l'entrée est fermée. */
+    public String readCommand() {
+        out.print("> ");
+        return scanner.hasNextLine() ? scanner.nextLine().trim() : null;
     }
 }
