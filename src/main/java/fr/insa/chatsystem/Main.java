@@ -1,11 +1,8 @@
 package fr.insa.chatsystem;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -38,10 +35,11 @@ public final class Main {
 
     private static void run() throws IOException, InterruptedException {
         // Création des objets
+        InetAddress myAddress = localAddress();
         ContactList contacts = new ContactList();
         UdpSender sender = new UdpSender(DISCOVERY_PORT);
         DiscoveryService discovery = new DiscoveryService(contacts, sender, DISCOVERY_WINDOW_MILLIS);
-        UdpListener listener = new UdpListener(DISCOVERY_PORT, discovery, localAddresses());
+        UdpListener listener = new UdpListener(DISCOVERY_PORT, discovery, Set.of(myAddress));
 
         // Thread d'écoute UDP
         Thread listenerThread = new Thread(listener, "udp-listener");
@@ -64,9 +62,11 @@ public final class Main {
         System.out.println("Searching for users on the network...");
         discovery.discover();
 
-        User me = cli.askUsername(discovery::isUsernameAvailable);
+        String username = cli.askUsername(discovery::isUsernameAvailable);
+        User me = new User(myAddress);
+        me.setUsername(username);
         discovery.announce(me.getUsername());
-        System.out.println("Welcome, " + me.getUsername() + "!");
+        System.out.println("Welcome, " + me.getUsername() + " (" + me.getIpAddress().getHostAddress() + ")!");
 
         // Affichage en direct des changements
         contacts.addListener(new ContactListener() {
@@ -111,12 +111,11 @@ public final class Main {
         }
     }
 
-    /** Toutes les adresses IP de cette machine, pour ignorer nos propres broadcasts. */
-    private static Set<InetAddress> localAddresses() throws SocketException {
-        Set<InetAddress> addresses = new HashSet<>();
-        for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-            addresses.addAll(Collections.list(ni.getInetAddresses()));
+    // L'IP de cette machine sur le réseau local.
+    private static InetAddress localAddress() throws IOException {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 80);
+            return socket.getLocalAddress();
         }
-        return addresses;
     }
 }
