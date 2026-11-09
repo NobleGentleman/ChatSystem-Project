@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 import fr.insa.chatsystem.DiscoveryMessage;
 
-public class UdpSender implements AutoCloseable {
+public class UdpSender implements MessageSender, AutoCloseable {
 
     private static final InetAddress BROADCAST = broadcastAddress();
 
@@ -23,12 +23,14 @@ public class UdpSender implements AutoCloseable {
         this.socket.setBroadcast(true);       // obligatoire pour envoyer en broadcast
     }
 
+    @Override
     public void send(DiscoveryMessage message, InetAddress destination) throws IOException {
         byte[] data = message.serialize().getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(data, data.length, destination, port);
         socket.send(packet);
     }
 
+    @Override
     public void broadcast(DiscoveryMessage message) throws IOException {
         send(message, BROADCAST);
     }

@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.insa.chatsystem.DiscoveryMessage;
-import fr.insa.chatsystem.MessageHandler;
 
 public class UdpListener implements Runnable {
 
