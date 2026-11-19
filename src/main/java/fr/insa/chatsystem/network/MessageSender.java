@@ -1,9 +1,9 @@
-package fr.insa.chatsystem.udp;
+package fr.insa.chatsystem.network;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
-import fr.insa.chatsystem.DiscoveryMessage;
+import fr.insa.chatsystem.discovery.DiscoveryMessage;
 
 public interface MessageSender {
     void send(DiscoveryMessage message, InetAddress destination) throws IOException;

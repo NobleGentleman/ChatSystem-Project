@@ -1,8 +1,8 @@
-package fr.insa.chatsystem.udp;
+package fr.insa.chatsystem.network;
 
 import java.net.InetAddress;
 
-import fr.insa.chatsystem.DiscoveryMessage;
+import fr.insa.chatsystem.discovery.DiscoveryMessage;
 
 public interface MessageHandler {
     void handle(DiscoveryMessage message, InetAddress sender);

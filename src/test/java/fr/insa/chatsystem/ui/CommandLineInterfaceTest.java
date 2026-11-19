@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.ui;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,5 +68,11 @@ class CommandLineInterfaceTest {
 
         assertTrue(outBuf.toString().contains(UsernameStatus.TOO_LONG.getMessage()));
         assertEquals("Alice", username);
+    }
+
+    /** Check that askUsername() returns null when the input is closed (Ctrl+D). */
+    @Test
+    void askUsername_returnsNullWhenInputIsClosed() throws UnknownHostException {
+        assertNull(cliWithInput("").askUsername());
     }
 }

@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.ui;
 
 public enum UsernameStatus {
     VALID("Valid username."),

@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.contacts;
 
 import java.net.InetAddress;
 import java.util.ArrayList;

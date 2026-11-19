@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.ui;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -21,6 +21,12 @@ public class CommandLineInterface {
     public String askUsername(Predicate<String> isAvailable) {
         while (true) {
             out.print("Please enter your username: ");
+
+            // Check if the input is still available to handle Ctrl+D (EOF).
+            if (!scanner.hasNextLine()) {
+                return null;
+            }
+
             String username = scanner.nextLine().trim();
 
             UsernameStatus status = UsernameValidator.validate(username);
@@ -34,7 +40,7 @@ public class CommandLineInterface {
         }
     }
 
-    /** Lit une commande tapée par l'utilisateur, ou null si l'entrée est fermée. */
+    /** Reads a command entered by the user, or null if the input is closed. */
     public String readCommand() {
         out.print("> ");
         return scanner.hasNextLine() ? scanner.nextLine().trim() : null;

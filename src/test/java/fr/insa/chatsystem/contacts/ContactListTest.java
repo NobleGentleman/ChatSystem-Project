@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.contacts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 class ContactListTest {
 
-    /** Faux listener : il note chaque notification reçue sous forme de texte. */
+    /** Dummy listener: it logs each notification received as text. */
     private static class RecordingListener implements ContactListener {
         final List<String> events = new ArrayList<>();
 
@@ -56,7 +56,7 @@ class ContactListTest {
         contacts.addListener(listener);
     }
 
-    // --- addOrUpdate ---
+    /** addOrUpdate() */
 
     @Test
     void newContactIsAddedAndNotified() {
@@ -97,7 +97,7 @@ class ContactListTest {
         assertThrows(NullPointerException.class, () -> contacts.addOrUpdate(ALICE_IP, null));
     }
 
-    // --- remove ---
+    /** remove() */
 
     @Test
     void knownContactIsRemovedAndNotified() {
@@ -115,7 +115,7 @@ class ContactListTest {
         assertTrue(listener.events.isEmpty());
     }
 
-    // --- isUsernameTaken ---
+    /** isUsernameTaken() */
 
     @Test
     void usernameOfActiveContactIsTaken() {
@@ -142,7 +142,7 @@ class ContactListTest {
         assertFalse(contacts.isUsernameTaken("Alice"));
     }
 
-    // --- getAll ---
+    /** getAll() */
 
     @Test
     void getAllReturnsACopy() {

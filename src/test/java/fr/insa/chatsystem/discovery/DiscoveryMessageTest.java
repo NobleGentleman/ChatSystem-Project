@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.discovery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class DiscoveryMessageTest {
 
-    // --- serialize ---
+    /** serialize() */
 
     @Test
     void announceIsSerializedWithTypeAndUsername() {
@@ -23,14 +23,14 @@ class DiscoveryMessageTest {
         assertEquals("USER_LEFT;", message.serialize());
     }
 
-    // --- constructor ---
+    /** constructor */
 
     @Test
     void nullTypeIsRejected() {
         assertThrows(NullPointerException.class, () -> new DiscoveryMessage(null, "Bob"));
     }
 
-    // --- parse: round trip ---
+    /** parse: round trip */
 
     @ParameterizedTest
     @EnumSource(DiscoveryMessage.Type.class)
@@ -51,7 +51,7 @@ class DiscoveryMessageTest {
         assertEquals("", parsed.getUsername());
     }
 
-    // --- parse: malformed messages ---
+    /** parse: malformed messages */
 
     @Test
     void nullMessageIsRejected() {

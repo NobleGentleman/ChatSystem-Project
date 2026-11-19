@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.contacts;
 
 public interface ContactListener {
     void onContactAdded(User user);

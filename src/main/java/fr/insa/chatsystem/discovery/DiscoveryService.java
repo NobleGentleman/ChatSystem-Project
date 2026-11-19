@@ -1,13 +1,15 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.discovery;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
+import fr.insa.chatsystem.contacts.ContactList;
+import fr.insa.chatsystem.ui.UsernameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.insa.chatsystem.udp.MessageHandler;
-import fr.insa.chatsystem.udp.MessageSender;
+import fr.insa.chatsystem.network.MessageHandler;
+import fr.insa.chatsystem.network.MessageSender;
 
 public class DiscoveryService implements MessageHandler {
 
@@ -17,7 +19,7 @@ public class DiscoveryService implements MessageHandler {
     private final MessageSender sender;
     private final long discoveryWindowMillis;
 
-    /** null tant que l'utilisateur n'a pas choisi de pseudo. */
+    /** null until the user has chosen a username. */
     private volatile String myUsername;
 
     public DiscoveryService(ContactList contacts, MessageSender sender, long discoveryWindowMillis) {
@@ -26,12 +28,11 @@ public class DiscoveryService implements MessageHandler {
         this.discoveryWindowMillis = discoveryWindowMillis;
     }
 
-    // --- Réception (appelé par le thread UDP) ---
+    /** Receive (called by the UDP thread). */
 
     @Override
     public void handle(DiscoveryMessage message, InetAddress from) {
         switch (message.getType()) {
-            
             case DISCOVERY_REQUEST:
                 String me = myUsername;
                 if (me != null) {
@@ -50,7 +51,21 @@ public class DiscoveryService implements MessageHandler {
                     LOG.warn("Ignoring invalid username '{}' from {}", message.getUsername(), from);
                     break;
                 }
+                if (message.getUsername().equalsIgnoreCase(myUsername)) {
+                    // If anyone wants my username, I'll let them know
+                    try {
+                        sender.send(new DiscoveryMessage(DiscoveryMessage.Type.USERNAME_TAKEN, myUsername), from);
+                    } catch (IOException e) {
+                        LOG.error("Unable to send USERNAME_TAKEN to {}", from, e);
+                    }
+                    break;
+                }
                 contacts.addOrUpdate(from, message.getUsername());
+                break;
+
+            case USERNAME_TAKEN:
+                LOG.warn("Username '{}' is already used, please restart with another one", message.getUsername());
+                myUsername = null;
                 break;
 
             case USER_LEFT:
@@ -62,9 +77,9 @@ public class DiscoveryService implements MessageHandler {
         }
     }
 
-    // --- Actions locales (appelées par la CLI / Main) ---
+    /** Local actions (called by the CLI / Main). */
 
-    /** Demande aux agents présents de se signaler, puis attend leurs réponses. */
+    /** Asks the present agents to signal themselves, then waits for their replies. */
     public void discover() throws IOException, InterruptedException {
         sender.broadcast(new DiscoveryMessage(DiscoveryMessage.Type.DISCOVERY_REQUEST, ""));
         Thread.sleep(discoveryWindowMillis);

@@ -1,4 +1,4 @@
-package fr.insa.chatsystem.udp;
+package fr.insa.chatsystem.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,7 +11,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.insa.chatsystem.DiscoveryMessage;
+import fr.insa.chatsystem.discovery.DiscoveryMessage;
 
 public class UdpListener implements Runnable {
 
@@ -46,6 +46,9 @@ public class UdpListener implements Runnable {
 
             } catch (IllegalArgumentException e) {
                 LOG.warn("Ignoring malformed packet from {}: {}", packet.getAddress(), e.getMessage());
+            } catch (RuntimeException e) {
+                LOG.error("Error while handling packet from {}", packet.getAddress(), e);
+                // Catch unexpected runtime exceptions to prevent the listener thread from stopping.
             } catch (IOException e) {
                 if (socket.isClosed()) {
                     LOG.info("UDP listener stopped");

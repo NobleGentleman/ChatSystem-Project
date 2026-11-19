@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.discovery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,16 +10,17 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.insa.chatsystem.contacts.ContactList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import fr.insa.chatsystem.DiscoveryMessage.Type;
-import fr.insa.chatsystem.udp.MessageSender;
+import fr.insa.chatsystem.discovery.DiscoveryMessage.Type;
+import fr.insa.chatsystem.network.MessageSender;
 
 class DiscoveryServiceTest {
 
-    /** Faux sender : n'envoie rien sur le réseau, note juste les appels. */
-    private static class FakeSender implements MessageSender {
+    /** Dummy sender: does not send anything over the network; simply logs calls. */
+    private static class DummySender implements MessageSender {
         final List<DiscoveryMessage> broadcasts = new ArrayList<>();
         final List<DiscoveryMessage> sent = new ArrayList<>();
         final List<InetAddress> destinations = new ArrayList<>();
@@ -45,19 +46,21 @@ class DiscoveryServiceTest {
     }
 
     private static final InetAddress ALICE_IP = ip("192.168.1.20");
+    private static final InetAddress BOB_IP = ip("192.168.1.21");
+
 
     private ContactList contacts;
-    private FakeSender sender;
+    private DummySender sender;
     private DiscoveryService service;
 
     @BeforeEach
     void setUp() {
         contacts = new ContactList();
-        sender = new FakeSender();
+        sender = new DummySender();
         service = new DiscoveryService(contacts, sender, 0); // pas d'attente dans les tests
     }
 
-    // --- DISCOVERY_REQUEST ---
+    /** DISCOVERY_REQUEST */
 
     @Test
     void requestIsIgnoredWhileIHaveNoUsername() {
@@ -78,7 +81,7 @@ class DiscoveryServiceTest {
         assertEquals(ALICE_IP, sender.destinations.get(0));
     }
 
-    // --- DISCOVERY_RESPONSE / ANNOUNCE ---
+    /** DISCOVERY_RESPONSE / ANNOUNCE */
 
     @Test
     void responseAddsContact() {
@@ -104,7 +107,7 @@ class DiscoveryServiceTest {
         assertTrue(contacts.getAll().isEmpty());
     }
 
-    // --- USER_LEFT ---
+    /** USER_LEFT */
 
     @Test
     void userLeftRemovesContact() {
@@ -114,7 +117,42 @@ class DiscoveryServiceTest {
         assertTrue(contacts.getAll().isEmpty());
     }
 
-    // --- Actions locales ---
+    /** USERNAME_TAKEN */
+
+    @Test
+    void announceOfMyUsernameIsAnsweredWithUsernameTaken() throws Exception {
+        service.announce("Mathis");
+        service.handle(new DiscoveryMessage(Type.ANNOUNCE, "mathis"), ALICE_IP);
+
+        assertEquals(Type.USERNAME_TAKEN, sender.sent.get(0).getType());
+        assertTrue(contacts.getAll().isEmpty());
+    }
+
+    @Test
+    void usernameTakenMakesMeForgetMyUsername() throws Exception {
+        service.announce("Mathis");
+        service.handle(new DiscoveryMessage(Type.USERNAME_TAKEN, "Mathis"), ALICE_IP);
+
+        assertNull(service.getMyUsername());
+    }
+
+    /** Check that all users announcing an already taken username are rejected. */
+    @Test
+    void everyIpAnnouncingMyUsernameGetsUsernameTaken() throws Exception {
+        service.announce("Mathis");
+
+        service.handle(new DiscoveryMessage(Type.ANNOUNCE, "Mathis"), ALICE_IP);
+        service.handle(new DiscoveryMessage(Type.ANNOUNCE, "mathis"), BOB_IP);
+
+        assertEquals(2, sender.sent.size());
+        assertEquals(Type.USERNAME_TAKEN, sender.sent.get(0).getType());
+        assertEquals(Type.USERNAME_TAKEN, sender.sent.get(1).getType());
+
+        assertEquals(List.of(ALICE_IP, BOB_IP), sender.destinations);
+        assertTrue(contacts.getAll().isEmpty());
+    }
+
+    /** Local actions */
 
     @Test
     void discoverBroadcastsRequest() throws Exception {

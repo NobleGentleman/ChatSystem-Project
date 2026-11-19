@@ -1,4 +1,4 @@
-package fr.insa.chatsystem.udp;
+package fr.insa.chatsystem.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -8,19 +8,19 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
-import fr.insa.chatsystem.DiscoveryMessage;
+import fr.insa.chatsystem.discovery.DiscoveryMessage;
 
 public class UdpSender implements MessageSender, AutoCloseable {
 
     private static final InetAddress BROADCAST = broadcastAddress();
 
     private final DatagramSocket socket;
-    private final int port; // port d'écoute des autres agents
+    private final int port; // Listening port for other agents
 
     public UdpSender(int port) throws SocketException {
         this.port = port;
-        this.socket = new DatagramSocket();   // port local choisi par le système
-        this.socket.setBroadcast(true);       // obligatoire pour envoyer en broadcast
+        this.socket = new DatagramSocket();   // Local port selected by the system
+        this.socket.setBroadcast(true);       // Required to send a broadcast
     }
 
     @Override

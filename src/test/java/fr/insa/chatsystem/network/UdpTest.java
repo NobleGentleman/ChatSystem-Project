@@ -1,4 +1,4 @@
-package fr.insa.chatsystem.udp;
+package fr.insa.chatsystem.network;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,14 +17,14 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import fr.insa.chatsystem.DiscoveryMessage;
+import fr.insa.chatsystem.discovery.DiscoveryMessage;
 
 class UdpTest {
 
     private static final int TEST_PORT = 45678;
     private static final InetAddress LOCALHOST = InetAddress.getLoopbackAddress();
 
-    /** Ce que le faux handler a reçu : le message et l'adresse de l'expéditeur. */
+    /** What the dummy handler received: the message and the sender’s address. */
     private static class Received {
         final DiscoveryMessage message;
         final InetAddress sender;
@@ -65,7 +65,7 @@ class UdpTest {
         Received r = received.poll(2, TimeUnit.SECONDS);
         assertNotNull(r, "no message received");
         assertEquals(DiscoveryMessage.Type.ANNOUNCE, r.message.getType());
-        assertEquals("Mathéo", r.message.getUsername()); // vérifie aussi l'UTF-8
+        assertEquals("Mathéo", r.message.getUsername()); // also checks for UTF-8
         assertEquals(LOCALHOST, r.sender);
     }
 
@@ -73,7 +73,7 @@ class UdpTest {
     void listenerSurvivesMalformedPacket() throws Exception {
         startListener(Set.of());
 
-        // paquet pourri envoyé "à la main", sans passer par DiscoveryMessage
+        // 'Garbage' packet sent 'manually', without using DiscoveryMessage
         try (DatagramSocket raw = new DatagramSocket()) {
             byte[] data = "garbage".getBytes(StandardCharsets.UTF_8);
             raw.send(new DatagramPacket(data, data.length, LOCALHOST, TEST_PORT));
