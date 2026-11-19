@@ -1,5 +1,6 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.database;
 
+import fr.insa.chatsystem.contacts.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

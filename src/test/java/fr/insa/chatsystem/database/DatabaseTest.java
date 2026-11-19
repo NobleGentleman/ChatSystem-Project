@@ -1,5 +1,6 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.database;
 
+import fr.insa.chatsystem.contacts.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
