@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.ui;
 
 public final class UsernameValidator {
     

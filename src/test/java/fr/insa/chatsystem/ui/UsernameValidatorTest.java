@@ -1,4 +1,4 @@
-package fr.insa.chatsystem;
+package fr.insa.chatsystem.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class UsernameValidatorTest {
 
-    // --- EMPTY ---
+    /** EMPTY */
 
     @Test
     void nullUsernameIsEmpty() {
@@ -23,7 +23,7 @@ class UsernameValidatorTest {
         assertEquals(UsernameStatus.EMPTY, UsernameValidator.validate("   "));
     }
 
-    // --- VALID ---
+    /** VALID */
 
     @Test
     void usernameWithAccentDigitsAndUnderscoreIsValid() {
@@ -40,7 +40,7 @@ class UsernameValidatorTest {
         assertEquals(UsernameStatus.VALID, UsernameValidator.validate("a"));
     }
 
-    // --- Length limit ---
+    /** Length limit */
 
     @Test
     void usernameAtMaxLengthIsValid() {
@@ -52,7 +52,7 @@ class UsernameValidatorTest {
         assertEquals(UsernameStatus.TOO_LONG, UsernameValidator.validate("abcdefghijklm")); // 13
     }
 
-    // --- INVALID_CHARACTERS ---
+    /** INVALID_CHARACTERS */
 
     @Test
     void usernameWithSpaceIsInvalid() {
